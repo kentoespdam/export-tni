@@ -17,7 +17,7 @@ router = APIRouter(
 @router.get("/{periode}")
 def index(
     periode: str,
-    pos: int = 0,
+    page: int = Query(1, ge=1),
     limit: int = 10,
     sort: Annotated[list[str] | None, Query()] = None,
     nosamw: str | None = None,
@@ -25,8 +25,7 @@ def index(
     db: Session = Depends(get_coklit_database_session)
 ):
     try:
-        offset = pos * limit
-        data = get_tagihan(db, periode, offset, limit, sort, nosamw, nama)
+        data = get_tagihan(db, periode, page, limit, sort, nosamw, nama)
         return data
     except Exception as e:
         print(e)

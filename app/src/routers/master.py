@@ -1,4 +1,3 @@
-from turtle import pos
 from typing import Annotated
 from ..schema.master_tni import MasterTniSchema
 from ..services.master_tni_svc import delete_master_tni, export_master_tni, get_master_tni, get_master_tni_by_nosamw, save_master_tni, update_master_tni
@@ -16,7 +15,7 @@ router = APIRouter(
 
 @router.get("/")
 async def root(
-    pos: int = 0,
+    page: int = Query(1, ge=1),
     limit: int = 10,
     sort: Annotated[list[str] | None, Query()] = None,
     nosamw: str | None = None,
@@ -29,9 +28,8 @@ async def root(
     try:
         if satker_id is not None:
             satker_id = Utility.decodeId(satker_id)
-        offset = pos*limit
         master_tni = get_master_tni(
-            db, dbCoklit, offset, limit, sort, nosamw, nama, is_aktif, satker_id)
+            db, dbCoklit, page, limit, sort, nosamw, nama, is_aktif, satker_id)
         return master_tni
     except Exception as e:
         print(e)
