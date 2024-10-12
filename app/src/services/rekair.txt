@@ -1,0 +1,32 @@
+def getRekeningTni(periode: str)->pd.DataFrame:
+    sql = f"""
+            SELECT
+                'PDAM Kabupaten Banyumas' AS pdam,
+                m.kotama AS matra,
+                m.satker,
+                r.nosamw,
+                m.nama,
+                r.alamat,
+                r.periode,
+                r.met_l,
+                r.met_l as met_l_ori,
+                r.met_k,
+                r.met_k as met_k_ori,
+                r.pakai,
+                r.pakai as pakai_ori,
+                r.dnmet,
+                r.r1,
+                r.r2,
+                r.r3,
+                r.r4,
+                r.denda,
+                r.ang_sb,
+                r.jasa_sb
+            FROM
+                rekair r
+            INNER JOIN master_tni m ON r.nosamw = m.nosamw
+            WHERE
+                r.periode = %s
+        """
+
+    return pd.read_sql(sql=sql, con=billingEngine, params=(periode,))

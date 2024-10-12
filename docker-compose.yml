@@ -1,0 +1,14 @@
+networks:
+  back-tier:
+    external: true
+    
+services:
+  coklit:
+    container_name: Coklit-BE
+    build: .
+    ports:
+      - "86:80"
+    env_file:
+      - .env
+    networks:
+      - back-tier
