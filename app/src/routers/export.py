@@ -33,7 +33,7 @@ def index(
 
 
 @router.get("/{id}/detail")
-def index(id: str, db: Session = Depends(get_coklit_database_session)):
+def detail(id: str, db: Session = Depends(get_coklit_database_session)):
     try:
         id = Utility.decodeId(id)
         data = getTagihanById(id, db)
