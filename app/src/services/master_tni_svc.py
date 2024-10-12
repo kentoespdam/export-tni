@@ -1,4 +1,4 @@
-from math import ceil
+import math
 import os
 from fastapi import BackgroundTasks
 from fastapi.responses import FileResponse
@@ -52,7 +52,7 @@ def get_master_tni(
         query = query.order_by(MasterTniModel.nosamw.asc())
     # print(query)
     result = query.offset(offset).limit(limit).all()
-    totalPages = ceil(total / limit)
+    totalPages = math.ceil(total / limit)
 
     return Utility.pagination(
         status=200 if result else 404,
