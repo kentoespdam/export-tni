@@ -1,13 +1,11 @@
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic import MySQLDsn
 from pydantic_core import MultiHostUrl
-from pydantic import MySQLDsn, computed_field
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
-        env_file=".env",
-        env_ignore_empty=True,
-        extra="ignore"
+        env_file=".env", env_ignore_empty=True, extra="ignore",
     )
 
     DB_HOST: str
@@ -16,6 +14,9 @@ class Settings(BaseSettings):
     COKLIT_DB_NAME: str
     DB_USER: str
     DB_PASS: str
+    SQUIDS_ALPHABET: str = "Asd"
+    SQUIDS_MIN_LENGTH: int
+    ALLOWED_ORIGINS: list[str]
 
     @property
     def SQLALCHEMY_DATABASE_URL(self):
@@ -25,7 +26,7 @@ class Settings(BaseSettings):
             port=self.DB_PORT,
             username=self.DB_USER,
             password=self.DB_PASS,
-            path=self.DB_NAME
+            path=self.DB_NAME,
         )
 
     @classmethod
@@ -36,7 +37,7 @@ class Settings(BaseSettings):
             port=cls.DB_PORT,
             username=cls.DB_USER,
             password=cls.DB_PASS,
-            path=cls.DB_NAME
+            path=cls.DB_NAME,
         )
 
     @property
@@ -47,7 +48,7 @@ class Settings(BaseSettings):
             port=self.DB_PORT,
             username=self.DB_USER,
             password=self.DB_PASS,
-            path=self.COKLIT_DB_NAME
+            path=self.COKLIT_DB_NAME,
         )
 
 

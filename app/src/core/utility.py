@@ -1,15 +1,16 @@
+import uuid
 from ast import List
 from datetime import datetime
-import uuid
+
 from fastapi.responses import JSONResponse
 from sqids import Sqids
-import numpy as np
 
+from src.core.config import settings
 
 class Utility:
     squids = Sqids(
-        alphabet="Kj3eblC5ocwv682gTtdMQIZpWH7hJsLkS0BP4EGruUYyqAOXm9nfxizVaRDFN1",
-        min_length=16,
+        alphabet=settings.SQUIDS_ALPHABET,
+        min_length=settings.SQUIDS_MIN_LENGTH,
     )
 
     @staticmethod
