@@ -87,6 +87,8 @@ async def export(
     background_task: BackgroundTasks = None,
 ):
     try:
+        if satker_id is not None:
+            satker_id = Utility.decodeId(satker_id)
         master_tni = export_master_tni(
             db, dbCoklit, nosamw, nama, is_aktif, satker_id, background_task)
         return master_tni
