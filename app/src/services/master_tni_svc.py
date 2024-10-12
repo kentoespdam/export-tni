@@ -1,5 +1,5 @@
-import math
 import os
+import math
 from fastapi import BackgroundTasks
 from fastapi.responses import FileResponse
 from pandas import DataFrame
@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 from ..services.satker import get_satker_by_id
 from ..models.master_tni_model import MasterTniModel
 from pydantic import BaseModel
-from ..core.utility import Utility, decodeId
+from ..core.utility import Utility
 import pandas as pd
 
 

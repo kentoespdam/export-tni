@@ -1,9 +1,6 @@
-from turtle import st
-from unittest import result
-from fastapi import Depends
 from src.models.rekair_model import RekairModel
 from src.schema.rekair_schm import RekairSchema
-from ..core.db import get_database_session, get_raw_database_session, billingEngine
+from ..core.db import get_raw_database_session
 import pandas as pd
 from sqlalchemy.orm import Session
 
