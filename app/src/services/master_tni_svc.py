@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 from ..services.satker import get_satker_by_id
 from ..models.master_tni_model import MasterTniModel
 from pydantic import BaseModel
-from ..core.utility import Utility
+from ..core.utility import Utility, decodeId
 import pandas as pd
 
 
@@ -140,10 +140,10 @@ def export_master_tni(
     background_task: BackgroundTasks,
 ):
     try:
-        satker = get_satker_by_id(satker_id, dbCoklit)
         query = db.query(MasterTniModel).filter(MasterTniModel.is_aktif == is_aktif)
 
-        if satker:
+        if satker_id:
+            satker = get_satker_by_id(satker_id, dbCoklit)
             likeNama = "%{}%".format(satker.nama)
             query = query.filter(MasterTniModel.satker.like(likeNama))
 
