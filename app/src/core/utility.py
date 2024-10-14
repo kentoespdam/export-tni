@@ -5,7 +5,7 @@ from datetime import datetime
 from fastapi.responses import JSONResponse
 from sqids import Sqids
 
-from src.core.config import settings
+from .config import settings
 
 class Utility:
     squids = Sqids(
@@ -73,6 +73,3 @@ class Utility:
             return Utility.squids.decode(id)[-5]
         except ValueError:
             return 0
-
-
-# print(Utility.uuid())
