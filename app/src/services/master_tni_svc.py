@@ -4,6 +4,8 @@ from fastapi import BackgroundTasks
 from fastapi.responses import FileResponse, JSONResponse
 from pandas import DataFrame
 from sqlalchemy.orm import Session
+
+from app.src.schema.master_tni import MasterTniSchema
 from ..services.satker import get_satker_by_id
 from ..models.master_tni_model import MasterTniModel
 from pydantic import BaseModel
@@ -110,7 +112,7 @@ def get_master_tni_by_nosamw(db: Session, nosamw: str) -> MasterTniModel | None:
     )
 
 
-def save_master_tni(db: Session, master_tni: MasterTni) -> JSONResponse:
+def save_master_tni(db: Session, master_tni: MasterTniSchema) -> JSONResponse:
     """
     Save a new MasterTni to the database.
 
@@ -135,7 +137,11 @@ def save_master_tni(db: Session, master_tni: MasterTni) -> JSONResponse:
     )
 
 
-def update_master_tni(db_session: Session, updated_master_tni: MasterTni, nosamw: str) -> JSONResponse:
+def update_master_tni(
+        db_session: Session, 
+        updated_master_tni: MasterTniSchema, 
+        nosamw: str
+    ) -> JSONResponse:
     """Update a master tni by nosamw.
 
     Args:
