@@ -39,8 +39,7 @@ async def root(
 @router.get("/{nosamw}")
 async def detail(nosamw: int, db: Session = Depends(get_database_session)):
     try:
-        master_tni = get_master_tni_by_nosamw(db, nosamw)
-        return Utility.dict_response(status=200, message="Data Found!", error=[], data=master_tni)
+        return get_master_tni_by_nosamw(db, nosamw)
     except Exception as e:
         print(e)
         return Utility.json_response(status=e, message="Server Error", error=[], data={})
@@ -49,8 +48,7 @@ async def detail(nosamw: int, db: Session = Depends(get_database_session)):
 @router.post("/")
 async def create(request: MasterTniSchema, db: Session = Depends(get_database_session)):
     try:
-        data = save_master_tni(db, request)
-        return data
+        return save_master_tni(db, request)
     except Exception as e:
         print(e)
         return Utility.dict_response(status=e, message="Server Error", error=[], data={})
@@ -59,8 +57,7 @@ async def create(request: MasterTniSchema, db: Session = Depends(get_database_se
 @router.put("/{nosamw}")
 async def update(nosamw: int, request: MasterTniSchema, db: Session = Depends(get_database_session)):
     try:
-        data = update_master_tni(db, request, nosamw)
-        return data
+        return update_master_tni(db, request, nosamw)
     except Exception as e:
         print(e)
         return Utility.dict_response(status=e, message="Server Error", error=[], data={})
@@ -69,8 +66,7 @@ async def update(nosamw: int, request: MasterTniSchema, db: Session = Depends(ge
 @router.delete("/{nosamw}")
 async def delete(nosamw: int, db: Session = Depends(get_database_session)):
     try:
-        data = delete_master_tni(db, nosamw)
-        return Utility.json_response(status=200, message="Delete Success", error=[], data={})
+        return delete_master_tni(db, nosamw)
     except Exception as e:
         print(e)
         return Utility.json_response(status=e, message="Server Error", error=[], data={})
