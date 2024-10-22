@@ -40,7 +40,7 @@ async def root(
 async def detail(nosamw: int, db: Session = Depends(get_database_session)):
     try:
         master_tni = get_master_tni_by_nosamw(db, nosamw)
-        return master_tni
+        return Utility.dict_response(status=200, message="Data Found!", error=[], data=master_tni)
     except Exception as e:
         print(e)
         return Utility.json_response(status=e, message="Server Error", error=[], data={})
@@ -53,7 +53,7 @@ async def create(request: MasterTniSchema, db: Session = Depends(get_database_se
         return data
     except Exception as e:
         print(e)
-        return Utility.json_response(status=e, message="Server Error", error=[], data={})
+        return Utility.dict_response(status=e, message="Server Error", error=[], data={})
 
 
 @router.put("/{nosamw}")
@@ -63,14 +63,14 @@ async def update(nosamw: int, request: MasterTniSchema, db: Session = Depends(ge
         return data
     except Exception as e:
         print(e)
-        return Utility.json_response(status=e, message="Server Error", error=[], data={})
+        return Utility.dict_response(status=e, message="Server Error", error=[], data={})
 
 
 @router.delete("/{nosamw}")
 async def delete(nosamw: int, db: Session = Depends(get_database_session)):
     try:
         data = delete_master_tni(db, nosamw)
-        return data
+        return Utility.json_response(status=200, message="Delete Success", error=[], data={})
     except Exception as e:
         print(e)
         return Utility.json_response(status=e, message="Server Error", error=[], data={})
