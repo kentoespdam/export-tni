@@ -5,7 +5,7 @@ from fastapi.responses import FileResponse, JSONResponse
 from pandas import DataFrame
 from sqlalchemy.orm import Session
 
-from app.src.schema.master_tni import MasterTniSchema
+from ..schema.master_tni import MasterTniSchema
 from ..services.satker import get_satker_by_id
 from ..models.master_tni_model import MasterTniModel
 from pydantic import BaseModel
