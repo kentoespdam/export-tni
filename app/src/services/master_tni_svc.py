@@ -132,8 +132,14 @@ def save_master_tni(db: Session, master_tni: MasterTniSchema) -> JSONResponse:
             status=409, message="Master Tni already exists", error=[], data={}
         )
     try:
-        new_data = MasterTniModel(nosamw=master_tni.nosamw, nama=master_tni.nama,
-                                  kotama=master_tni.kotama, satker=master_tni.satker)
+        new_data = MasterTniModel(
+            nosamw=master_tni.nosamw,
+            nama=master_tni.nama,
+            kotama=master_tni.kotama,
+            satker=master_tni.satker,
+            is_aktif=master_tni.is_aktif
+        )
+        
         db.add(new_data)
         db.commit()
         db.refresh(new_data)
