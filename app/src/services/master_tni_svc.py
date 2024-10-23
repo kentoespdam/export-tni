@@ -3,6 +3,7 @@ import math
 from fastapi import BackgroundTasks
 from fastapi.responses import FileResponse, JSONResponse
 from pandas import DataFrame
+from pymysql import DataError
 from sqlalchemy.orm import Session
 
 from ..schema.master_tni import MasterTniSchema
@@ -103,7 +104,8 @@ def get_master_tni_by_nosamw(db: Session, nosamw: str) -> MasterTniModel | None:
     Returns:
         MasterTniModel | None: The retrieved MasterTniModel or None if not found.
     """
-    result = db.query(MasterTniModel).filter(MasterTniModel.nosamw == nosamw).first()
+    result = db.query(MasterTniModel).filter(
+        MasterTniModel.nosamw == nosamw).first()
     return Utility.dict_response(
         status=200 if result else 404,
         message="Data Found" if result else "Not Found",
@@ -123,25 +125,30 @@ def save_master_tni(db: Session, master_tni: MasterTniSchema) -> JSONResponse:
     Returns:
         JSONResponse: A JSON response indicating the result of the operation.
     """
-    existing_master_tni = get_master_tni_by_nosamw(db, master_tni.nosamw)
+    existing_master_tni = db.query(MasterTniModel).filter(
+        MasterTniModel.nosamw == master_tni.nosamw).first()
     if existing_master_tni:
         return Utility.json_response(
             status=409, message="Master Tni already exists", error=[], data={}
         )
-
-    db.add(master_tni)
-    db.commit()
-    db.refresh(master_tni)
-    return Utility.dict_response(
-        status=201, message="Master Tni created", error=[], data=master_tni
-    )
+    try:
+        new_data = MasterTniModel(nosamw=master_tni.nosamw, nama=master_tni.nama,
+                                  kotama=master_tni.kotama, satker=master_tni.satker)
+        db.add(new_data)
+        db.commit()
+        db.refresh(new_data)
+        return Utility.dict_response(
+            status=201, message="Master Tni created", error=[], data=master_tni
+        )
+    except Exception as e:
+        return Utility.dict_response(status=500, message="Server Error", error=e.args, data={})
 
 
 def update_master_tni(
-        db_session: Session, 
-        updated_master_tni: MasterTniSchema, 
-        nosamw: str
-    ) -> JSONResponse:
+    db_session: Session,
+    updated_master_tni: MasterTniSchema,
+    nosamw: str
+) -> JSONResponse:
     """Update a master tni by nosamw.
 
     Args:
@@ -152,7 +159,8 @@ def update_master_tni(
     Returns:
     JSONResponse: A JSON response indicating the result of the operation.
     """
-    existing_master_tni = db_session.query(MasterTniModel).filter_by(nosamw=nosamw).first()
+    existing_master_tni = db_session.query(
+        MasterTniModel).filter_by(nosamw=nosamw).first()
     if not existing_master_tni:
         return Utility.json_response(
             status=404, message="Data Not Found", error=[], data={}
@@ -191,7 +199,6 @@ def delete_master_tni(db_session: Session, nosamw: str) -> JSONResponse:
 
     return Utility.json_response(
         status=200, message="Delete Success", error=[], data={})
-
 
 
 def remove_file(path: str):
