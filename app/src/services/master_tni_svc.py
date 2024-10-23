@@ -132,7 +132,7 @@ def save_master_tni(db: Session, master_tni: MasterTniSchema) -> JSONResponse:
     db.add(master_tni)
     db.commit()
     db.refresh(master_tni)
-    return Utility.json_response(
+    return Utility.dict_response(
         status=201, message="Master Tni created", error=[], data=master_tni
     )
 
@@ -165,7 +165,7 @@ def update_master_tni(
     db_session.commit()
     db_session.refresh(existing_master_tni)
 
-    return Utility.json_response(status=200, message="Update Success", error=[], data=existing_master_tni)
+    return Utility.dict_response(status=200, message="Update Success", error=[], data=existing_master_tni)
 
 
 def delete_master_tni(db_session: Session, nosamw: str) -> JSONResponse:
