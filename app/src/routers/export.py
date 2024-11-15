@@ -22,10 +22,13 @@ def index(
     sort: Annotated[list[str] | None, Query()] = None,
     nosamw: str | None = None,
     nama: str | None = None,
+    satker_id: str | None = None,
     db: Session = Depends(get_coklit_database_session)
 ):
+    satker = Utility.decodeId(satker_id)
     try:
-        data = get_tagihan(db, periode, page, limit, sort, nosamw, nama)
+        data = get_tagihan(db, periode, page, limit,
+                           sort, nosamw, nama, satker)
         return data
     except Exception as e:
         print(e)

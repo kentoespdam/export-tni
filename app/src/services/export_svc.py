@@ -22,6 +22,7 @@ def get_tagihan(
     sort: list[list[str]] | None = None,
     nosamw: str | None = None,
     nama: str | None = None,
+    satker_id: int | None = None,
 ) -> Dict[str, any]:
     """
     Retrieve tagihan data from the database.
@@ -45,6 +46,10 @@ def get_tagihan(
         stmt = stmt.filter(RekeningTniModel.nosamw == nosamw)
     if nama:
         stmt = stmt.filter(RekeningTniModel.nama.like(f"%{nama}%"))
+    if satker_id:
+        satker = db.query(SatkerModel).filter(
+            SatkerModel.id == satker_id).first()
+        stmt = stmt.filter(RekeningTniModel.satker == satker.nama)
 
     total = stmt.count()
     if sort:
