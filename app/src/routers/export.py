@@ -25,7 +25,7 @@ def index(
     satker_id: str | None = None,
     db: Session = Depends(get_coklit_database_session)
 ):
-    satker = Utility.decodeId(satker_id)
+    satker = Utility.decodeId(satker_id) if satker_id else None
     try:
         data = get_tagihan(db, periode, page, limit,
                            sort, nosamw, nama, satker)
