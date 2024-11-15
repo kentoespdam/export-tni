@@ -13,7 +13,7 @@ router = APIRouter(
 @router.get("/{periode}")
 async def root(periode: str):
     try:
-        data = await getRekair(periode)
+        data = getRekair(periode)
         return Utility.dict_response(
             status=SUCCESS,
             message="Success",

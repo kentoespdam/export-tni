@@ -52,7 +52,8 @@ def get_tagihan(
             slist = s.split(",")
             field = getattr(RekeningTniModel, slist[0])
             order = slist[1] if len(slist) > 1 else "asc"
-            stmt = stmt.order_by(field.asc() if order == "asc" else field.desc())
+            stmt = stmt.order_by(field.asc() if order ==
+                                 "asc" else field.desc())
 
     result: list[RekeningTniModel] = stmt.offset(offset).limit(limit).all()
     totalPages = math.ceil(total / limit)
@@ -108,7 +109,8 @@ def get_latest_sync(periode: str, db: Session) -> bool:
     Returns:
         bool: Whether a sync log exists for the given periode.
     """
-    query = db.query(SyncLogModel).filter(SyncLogModel.periode == periode).exists()
+    query = db.query(SyncLogModel).filter(
+        SyncLogModel.periode == periode).exists()
     exists = db.query(query).scalar()
     return exists
 
@@ -188,15 +190,16 @@ def update_tagihan(
             status=404, message="Tagihan not found", error=[], data={}
         )
 
+    pakai = data.met_k-data.met_l
+
     # rekening = detail_rekening(tagihan.nosamw, tagihan.periode, db_billing)
-    beban1 = float(min(10, float(data.pakai)))
-    beban2 = float(min(10, max(0, float(data.pakai) - beban1)))
-    beban3 = float(max(0, float(data.pakai) - beban1 - beban2))
+    beban1 = float(min(10, float(pakai)))
+    beban2 = float(min(10, max(0, float(pakai) - beban1)))
+    beban3 = float(max(0, float(pakai) - beban1 - beban2))
 
     tagihan.met_l = data.met_l
     tagihan.met_k = data.met_k
-    tagihan.pakai = data.pakai
-    tagihan.rata2 = data.rata2
+    tagihan.pakai = pakai
     tagihan.r1 = beban1 * tagihan.t1
     tagihan.r2 = beban2 * tagihan.t2
     tagihan.r3 = beban3 * tagihan.t3
@@ -219,7 +222,8 @@ def export_csv(periode: str, satker_id: int, db: Session) -> StreamingResponse:
         StreamingResponse: A StreamingResponse with the CSV data.
     """
     satker = db.query(SatkerModel).filter(SatkerModel.id == satker_id).first()
-    stmt = db.query(RekeningTniModel).filter(RekeningTniModel.periode == periode)
+    stmt = db.query(RekeningTniModel).filter(
+        RekeningTniModel.periode == periode)
     stmt = stmt.filter(RekeningTniModel.satker == satker.nama)
     rows = stmt.all()
     if rows is None:
@@ -261,7 +265,8 @@ def export_csv(periode: str, satker_id: int, db: Session) -> StreamingResponse:
     df = pd.DataFrame(data)
     stream = io.StringIO()
     df.to_csv(stream, index=False)
-    response = StreamingResponse(iter([stream.getvalue()]), media_type="text/csv")
+    response = StreamingResponse(
+        iter([stream.getvalue()]), media_type="text/csv")
     response.headers["Content-Disposition"] = (
         f"attachment; filename=rekening_tni_{satker.nama}_{periode}.csv"
     )

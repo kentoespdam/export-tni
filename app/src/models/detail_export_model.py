@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Integer, Double
+from sqlalchemy import DECIMAL, Column, String, Integer, Double
 from src.core.db import Base
 
 
@@ -13,7 +13,7 @@ class RekeningTniModel(Base):
     nama = Column(String)
     alamat = Column(String)
     periode = Column(String)
-    met_l = Column(Double)
+    met_l = Column(DECIMAL(10, 2))
     met_l_ori = Column(Double)
     met_k = Column(Double)
     met_k_ori = Column(Double)
