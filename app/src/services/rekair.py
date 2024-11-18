@@ -77,6 +77,7 @@ def get_rekening_tni(periode: str) -> pd.DataFrame:
                 """
             cursor.execute(sql, (periode,))
             data = cursor.fetchall()
+            if len(data) == 0: return None
             columns = [desc[0] for desc in cursor.description]
             df = pd.DataFrame(data, columns=columns)
             cursor.close()
