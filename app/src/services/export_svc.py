@@ -250,7 +250,7 @@ def export_csv(periode: str, satker_id: int, db: Session) -> StreamingResponse:
                 "Stan Angkat": int(0),
                 "Pakai (m3)": int(row.pakai),
                 "Tarif": int(0),
-                "Tagihan": int(row.r1 + row.r2 + row.r3 + row.r4),
+                "Tagihan": int(row.r1 + row.r2 + row.r3 + row.r4+row.dnmet),
                 "Denda": int(row.denda),
                 "Total Tagihan": int(
                     row.dnmet
@@ -263,7 +263,7 @@ def export_csv(periode: str, satker_id: int, db: Session) -> StreamingResponse:
                     + row.jasa_sb
                 ),
                 "Pemeliharaan": int(0),
-                "Administrasi": int(row.dnmet),
+                "Administrasi": int(0),
                 "Kelainan": "",
             }
         )
