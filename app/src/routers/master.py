@@ -93,7 +93,7 @@ async def export(
         return Utility.json_response(status=e, message="Server Error", error=[], data={})
 
 
-@router.get("/export/excel/csv")
+@router.get("/export/csv")
 async def export(
     nosamw: str | None = None,
     nama: str | None = None,
