@@ -1,6 +1,6 @@
 from typing import Annotated
 from ..schema.master_tni import MasterTniSchema
-from ..services.master_tni_svc import delete_master_tni, export_master_tni, get_master_tni, get_master_tni_by_nosamw, save_master_tni, update_master_tni
+from ..services.master_tni_svc import delete_master_tni, export_master_tni, export_master_tni_csv, get_master_tni, get_master_tni_by_nosamw, save_master_tni, update_master_tni
 from ..core.utility import Utility
 from fastapi import APIRouter, BackgroundTasks, Depends, Query
 from sqlalchemy.orm import Session
@@ -87,6 +87,26 @@ async def export(
             satker_id = Utility.decodeId(satker_id)
         master_tni = export_master_tni(
             db, dbCoklit, nosamw, nama, is_aktif, satker_id, background_task)
+        return master_tni
+    except Exception as e:
+        print(e)
+        return Utility.json_response(status=e, message="Server Error", error=[], data={})
+
+
+@router.get("/export/excel/csv")
+async def export(
+    nosamw: str | None = None,
+    nama: str | None = None,
+    is_aktif: bool = True,
+    satker_id: str | None = None,
+    db: Session = Depends(get_database_session),
+    dbCoklit: Session = Depends(get_coklit_database_session),
+):
+    try:
+        if satker_id is not None:
+            satker_id = Utility.decodeId(satker_id)
+        master_tni = export_master_tni_csv(
+            db, dbCoklit, nosamw, nama, is_aktif, satker_id)
         return master_tni
     except Exception as e:
         print(e)

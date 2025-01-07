@@ -1,3 +1,4 @@
+from math import e
 from typing import Generator
 
 import pymysql
@@ -5,11 +6,13 @@ from src.core.config import settings
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
 
-billingEngine = create_engine(str(settings.SQLALCHEMY_DATABASE_URL))
-coklitEngine = create_engine(str(settings.COKLIT_DATABASE_URL))
+billingEngine = create_engine(str(settings.SQLALCHEMY_DATABASE_URL), echo=True)
+coklitEngine = create_engine(str(settings.COKLIT_DATABASE_URL), echo=True)
 
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=billingEngine)
-SessionCoklit = sessionmaker(autocommit=False, autoflush=False, bind=coklitEngine)
+SessionLocal = sessionmaker(
+    autocommit=False, autoflush=False, bind=billingEngine)
+SessionCoklit = sessionmaker(
+    autocommit=False, autoflush=False, bind=coklitEngine)
 
 Base = declarative_base()
 
@@ -22,12 +25,14 @@ def get_database_session() -> Generator:
     finally:
         db.close()
 
+
 def get_coklit_database_session() -> Generator:
     try:
         db = SessionCoklit()
         yield db
     finally:
         db.close()
+
 
 def get_raw_database_session():
     return pymysql.connect(

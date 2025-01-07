@@ -1,17 +1,21 @@
+from datetime import datetime
+import io
 import os
 import math
+from unittest import result
 from fastapi import BackgroundTasks
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
 from pandas import DataFrame
-from pymysql import DataError
 from sqlalchemy.orm import Session
 
+from ..models.cust_model import CustModel
 from ..schema.master_tni import MasterTniSchema
 from ..services.satker import get_satker_by_id
 from ..models.master_tni_model import MasterTniModel
 from pydantic import BaseModel
 from ..core.utility import Utility
 import pandas as pd
+import numpy as np
 
 
 class MasterTni(BaseModel):
@@ -51,7 +55,14 @@ def get_master_tni(
     """
     offset = max(0, page - 1) * limit
     satker = get_satker_by_id(satker_id, db_coklit_session)
-    query = db_session.query(MasterTniModel).filter_by(is_aktif=is_aktif)
+    query = db_session.query(
+        MasterTniModel.nosamw,
+        MasterTniModel.nama,
+        MasterTniModel.kotama,
+        MasterTniModel.satker,
+        MasterTniModel.is_aktif,
+        CustModel.urjlw
+    ).join(CustModel, MasterTniModel.nosamw == CustModel.nosamw).filter(MasterTniModel.is_aktif == is_aktif)
 
     if satker:
         query = query.filter(
@@ -59,7 +70,9 @@ def get_master_tni(
         )
 
     if nosamw:
-        query = query.filter_by(nosamw=nosamw)
+        query = query.filter(
+            MasterTniModel.nosamw == nosamw
+        )
 
     if nama:
         query = query.filter(
@@ -77,7 +90,17 @@ def get_master_tni(
 
     query = query.offset(offset).limit(limit)
 
-    result = query.all()
+    rows = query.all()
+    result = []
+    for row in rows:
+        result.append({
+            "nosamw": row.nosamw,
+            "nama": row.nama,
+            "kotama": row.kotama,
+            "satker": row.satker,
+            "is_aktif": row.is_aktif,
+            "urjlw": row.urjlw,
+        })
     total_pages = math.ceil(total / limit)
 
     return Utility.pagination(
@@ -139,7 +162,7 @@ def save_master_tni(db: Session, master_tni: MasterTniSchema) -> JSONResponse:
             satker=master_tni.satker,
             is_aktif=master_tni.is_aktif
         )
-        
+
         db.add(new_data)
         db.commit()
         db.refresh(new_data)
@@ -224,8 +247,17 @@ def export_master_tni(
     background_task: BackgroundTasks,
 ):
     try:
-        query = db.query(MasterTniModel).filter(
-            MasterTniModel.is_aktif == is_aktif)
+        query = db.query(
+            MasterTniModel.nosamw,
+            MasterTniModel.nama,
+            MasterTniModel.kotama,
+            MasterTniModel.satker,
+            MasterTniModel.is_aktif,
+            CustModel.urjlw
+        ).join(
+            CustModel,
+            MasterTniModel.nosamw == CustModel.nosamw
+        ).filter(MasterTniModel.is_aktif == is_aktif)
 
         if satker_id:
             satker = get_satker_by_id(satker_id, dbCoklit)
@@ -250,6 +282,7 @@ def export_master_tni(
                     "kotama": row.kotama,
                     "satker": row.satker,
                     "is_aktif": row.is_aktif,
+                    "urjlw": row.urjlw
                 }
             )
             urut += 1
@@ -260,6 +293,59 @@ def export_master_tni(
             "master_tni.xlsx", filename="master_tni.xlsx")
         background_task.add_task(remove_file, "master_tni.xlsx")
         return file_response
+    except Exception as e:
+        print(e)
+        return Utility.json_response(
+            status=e, message="Server Error", error=[], data={}
+        )
+
+
+def export_master_tni_csv(
+    db: Session,
+    dbCoklit: Session,
+    nosamw: str | None,
+    nama: str | None,
+    is_aktif: bool,
+    satker_id: int | None,
+):
+    try:
+        query = db.query(
+            MasterTniModel.nosamw,
+            MasterTniModel.satker,
+            CustModel.urjlw
+        ).join(
+            CustModel,
+            MasterTniModel.nosamw == CustModel.nosamw
+        ).filter(MasterTniModel.is_aktif == is_aktif)
+
+        if satker_id:
+            satker = get_satker_by_id(satker_id, dbCoklit)
+            likeNama = "%{}%".format(satker.nama)
+            query = query.filter(MasterTniModel.satker.like(likeNama))
+
+        if nosamw:
+            query = query.filter(MasterTniModel.nosamw == nosamw)
+
+        if nama:
+            likeNama = "%{}%".format(nama)
+            query = query.filter(MasterTniModel.nama.like(likeNama))
+
+        rows = query.all()
+
+        data = pd.DataFrame(
+            rows, columns=["No Sambungan", "Satker", "Golongan"])
+        data["Golongan"] = data["Golongan"].astype(str)
+
+        df = pd.DataFrame(data)
+        stream = io.StringIO()
+        df.to_csv(stream, index=False)
+        response = StreamingResponse(
+            iter([stream.getvalue()]), media_type="text/csv")
+        response.headers["Content-Disposition"] = (
+            f"attachment; filename=master_tni_{
+                datetime.now().strftime('%Y%m%d%H%M%S')}.csv"
+        )
+        return response
     except Exception as e:
         print(e)
         return Utility.json_response(
