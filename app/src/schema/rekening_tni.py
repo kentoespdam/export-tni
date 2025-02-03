@@ -24,6 +24,7 @@ class RekeningTniUpdateRequest(BaseModel):
     nosamw: str
     met_l: Decimal
     met_k: Decimal
+    pakai: Decimal
 
 ExportColumns = [
     "pdam",

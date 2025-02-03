@@ -1,3 +1,4 @@
+from ast import And
 import io
 import math
 from typing import Any, Dict
@@ -193,6 +194,13 @@ def update_tagihan(
     if tagihan is None:
         return Utility.dict_response(
             status=404, message="Tagihan not found", error=[], data={}
+        )
+    
+    if data.pakai and data.met_l is None and data.met_k is None:
+        tagihan.pakai = data.pakai
+        db.commit()
+        return Utility.json_response(
+            status=201, message="Tagihan updated", error=[], data={}
         )
 
     pakai = data.met_k-data.met_l
