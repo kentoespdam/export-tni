@@ -196,7 +196,7 @@ def update_tagihan(
             status=404, message="Tagihan not found", error=[], data={}
         )
 
-    pakai = data.pakai if data.pakai else data.met_k-data.met_l
+    pakai = data.met_k-data.met_l
 
     # rekening = detail_rekening(tagihan.nosamw, tagihan.periode, db_billing)
     beban1 = float(min(10, float(pakai)))
