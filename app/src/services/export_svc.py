@@ -195,15 +195,8 @@ def update_tagihan(
         return Utility.dict_response(
             status=404, message="Tagihan not found", error=[], data={}
         )
-    
-    if data.pakai and data.met_l is None and data.met_k is None:
-        tagihan.pakai = data.pakai
-        db.commit()
-        return Utility.json_response(
-            status=201, message="Tagihan updated", error=[], data={}
-        )
 
-    pakai = data.met_k-data.met_l
+    pakai = data.pakai if data.pakai else data.met_k-data.met_l
 
     # rekening = detail_rekening(tagihan.nosamw, tagihan.periode, db_billing)
     beban1 = float(min(10, float(pakai)))
